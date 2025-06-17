@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planificador - Cuarteto Shalom</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="nav">
+  <a href="index.html">Inicio</a>
+  <a href="register.html">Registrarse</a>
+  <a href="login.html">Iniciar Sesión</a>
+  <a href="admin.html">Panel del Administrador</a>
+  </div>
+
+
+  <div class="container">
+    <!-- Logo en cabecera -->
+    <div class="logo-container">
+      <img src="../CRONOGRAMA-SHALOM/Imagenes/WhatsApp Image 2025-05-27 at 10.11.38 PM.jpeg" alt="Foto Cuarteto Shalom" class="logo">
+    </div>
+
+    <h1>🎶 Planificador de Eventos  <br>Cuarteto Shalom</h1>
+
+    <!-- Formulario de registro -->
+    <div id="register-section">
+      <h2>Registrarse</h2>
+      <input type="text" id="new-username" placeholder="Nuevo usuario">
+      <input type="password" id="new-password" placeholder="Nueva contraseña">
+      <button onclick="register()">Registrar</button>
+    </div>
+
+    <!-- Formulario de inicio de sesión -->
+    <div id="login-section">
+      <h2>Inicio de sesión</h2>
+      <input type="text" id="username" placeholder="Usuario">
+      <input type="password" id="password" placeholder="Contraseña">
+      <button onclick="login()">Ingresar</button>
+    </div>
+
+    <!-- Sección de contenido para administrador -->
+    <div id="admin-section" style="display:none">
+      <form id="event-form">
+        <input type="text" id="event-name" placeholder="Nombre del evento" required>
+        <input type="date" id="event-date" required>
+        <input type="text" id="event-location" placeholder="Lugar" required>
+        <button type="submit">Agregar evento</button>
+      </form>
+
+      <h2>📅 Lista de Eventos</h2>
+      <table id="event-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Nombre</th>
+            <th>Lugar</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="event-list"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('event-form');
+    const eventList = document.getElementById('event-list');
+
+    document.addEventListener('DOMContentLoaded', loadEvents);
+
+    form?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('event-name').value;
+      const date = document.getElementById('event-date').value;
+      const location = document.getElementById('event-location').value;
+
+      const event = { name, date, location };
+      addEventToTable(event);
+      saveEvent(event);
+      form.reset();
+    });
+
+    function addEventToTable(event) {
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+        <td>${event.date}</td>
+        <td>${event.name}</td>
+        <td>${event.location}</td>
+        <td>
+          <button onclick='editEvent(this)'>Editar</button>
+          <button onclick='deleteEvent(this)'>Eliminar</button>
+        </td>
+      `;
+
+      eventList.appendChild(row);
+    }
+
+    function saveEvent(event) {
+      const events = getEvents();
+      events.push(event);
+      localStorage.setItem('shalom-events', JSON.stringify(events));
+    }
+
+    function getEvents() {
+      return JSON.parse(localStorage.getItem('shalom-events')) || [];
+    }
+
+    function loadEvents() {
+      const events = getEvents();
+      events.forEach(addEventToTable);
+    }
+
+    function deleteEvent(button) {
+      const row = button.parentElement.parentElement;
+      const date = row.children[0].textContent;
+      const name = row.children[1].textContent;
+      const location = row.children[2].textContent;
+
+      let events = getEvents();
+      events = events.filter(event =>
+        !(event.name === name && event.date === date && event.location === location)
+      );
+      localStorage.setItem('shalom-events', JSON.stringify(events));
+      row.remove();
+    }
+
+    function editEvent(button) {
+      const row = button.parentElement.parentElement;
+      // const date = row.children[0].textContent;
+      const name = row.children[1].textContent;
+      const location = row.children[2].textContent;
+
+      document.getElementById('event-name').value = name;
+      document.getElementById('event-date').value = date;
+      document.getElementById('event-location').value = location;
+
+      deleteEvent(button);
+    }
+
+    function register() {
+      const newUser = document.getElementById('new-username').value;
+      const newPass = document.getElementById('new-password').value;
+
+      if (!newUser || !newPass) {
+        alert('Por favor completa ambos campos.');
+        return;
+      }
+
+      localStorage.setItem('admin-user', newUser);
+      localStorage.setItem('admin-pass', newPass);
+      alert('Registro exitoso. Ahora puedes iniciar sesión.');
+
+      document.getElementById('new-username').value = '';
+      document.getElementById('new-password').value = '';
+    }
+
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const savedUser = localStorage.getItem('admin-user');
+      const savedPass = localStorage.getItem('admin-pass');
+
+      if (username === savedUser && password === savedPass) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('register-section').style.display = 'none';
+        document.getElementById('admin-section').style.display = 'block';
+      } else {
+        alert('Usuario o contraseña incorrectos');
+      }
+
+    }
+  </script>
+</body>
+</html>

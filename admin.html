@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel del Administrador</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <script>
+    // Verifica si el usuario está logueado; si no, lo redirige al login
+    if (localStorage.getItem('loggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Navegación superior -->
+  <div class="nav">
+    <a href="index.html">Inicio</a>
+    <a href="#" onclick="logout()">Cerrar Sesión</a>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="container">
+    <h1>Bienvenido al Panel del Cuarteto Shalom 🎶</h1>
+
+    <!-- Formulario para agregar eventos -->
+    <form id="event-form">
+      <input type="text" id="event-name" placeholder="Nombre del evento" required>
+      <input type="date" id="event-date" required>
+      <input type="text" id="event-location" placeholder="Ubicación del evento" required>
+      <button type="submit">Agregar Evento</button>
+    </form>
+
+    <!-- Tabla para mostrar eventos -->
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Nombre</th>
+          <th>Ubicación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="event-list">
+        <!-- Aquí se cargarán dinámicamente los eventos -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Script para manejar eventos -->
+  <script>
+    const form = document.getElementById('event-form');
+    const eventList = document.getElementById('event-list');
+
+    // Cargar eventos al cargar la página
+    document.addEventListener('DOMContentLoaded', loadEvents);
+
+    // Manejar el envío del formulario
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('event-name').value;
+      const date = document.getElementById('event-date').value;
+      const location = document.getElementById('event-location').value;
+
+      const event = { name, date, location };
+      addEventToTable(event);
+      saveEvent(event);
+
+      form.reset();
+    });
+
+    // Agrega el evento a la tabla
+    function addEventToTable(event) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${event.date}</td>
+        <td>${event.name}</td>
+        <td>${event.location}</td>
+        <td>
+          <button class="edit-btn">Editar</button>
+          <button class="delete-btn">Eliminar</button>
+        </td>
+      `;
+
+      // Botón eliminar
+      row.querySelector('.delete-btn').addEventListener('click', () => {
+        deleteEvent(event);
+        row.remove();
+      });
+
+      // Botón editar
+      row.querySelector('.edit-btn').addEventListener('click', () => {
+        document.getElementById('event-name').value = event.name;
+        document.getElementById('event-date').value = event.date;
+        document.getElementById('event-location').value = event.location;
+
+        deleteEvent(event);
+        row.remove();
+      });
+
+      eventList.appendChild(row);
+    }
+
+    // Guardar evento en localStorage
+    function saveEvent(event) {
+      const events = getEvents();
+      events.push(event);
+      localStorage.setItem('shalom-events', JSON.stringify(events));
+    }
+
+    // Obtener eventos
+    function getEvents() {
+      return JSON.parse(localStorage.getItem('shalom-events')) || [];
+    }
+
+    // Cargar eventos existentes al DOM
+    function loadEvents() {
+      const events = getEvents();
+      events.forEach(addEventToTable);
+    }
+
+    // Eliminar evento del almacenamiento
+    function deleteEvent(eventToDelete) {
+      let events = getEvents();
+      events = events.filter(ev =>
+        !(ev.name === eventToDelete.name &&
+          ev.date === eventToDelete.date &&
+          ev.location === eventToDelete.location)
+      );
+      localStorage.setItem('shalom-events', JSON.stringify(events));
+    }
+
+    // Cerrar sesión
+    function logout() {
+      localStorage.setItem('loggedIn', 'false');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>

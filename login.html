@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar Sesión</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Si el usuario no se ha registrado, lo redirige a la página de registro
+    if (localStorage.getItem('registered') !== 'true') {
+      window.location.href = 'register.html';
+    }
+
+    // Si ya inició sesión previamente, lo lleva directo al panel de administrador
+    if (localStorage.getItem('loggedIn') === 'true') {
+      window.location.href = 'admin.html';
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Navegación -->
+  <div class="nav">
+    <a href="index.html">Inicio</a>
+    <a href="register.html">Registrarse</a>
+    <a href="login.html">Iniciar Sesión</a>
+    <a href="admin.html">Panel del Administrador</a>
+  </div>
+
+  <!-- Contenedor del formulario -->
+  <div class="container">
+    <h2>Iniciar Sesión</h2>
+    <form id="login-form">
+      <input type="text" id="login-username" placeholder="Usuario" required>
+      <input type="password" id="login-password" placeholder="Contraseña" required>
+      <button type="submit">Ingresar</button>
+    </form>
+  </div>
+
+  <script>
+    // Maneja el envío del formulario de login
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault(); // Evita recarga de la página
+
+      // Obtiene los valores ingresados
+      const user = document.getElementById('login-username').value.trim();
+      const pass = document.getElementById('login-password').value.trim();
+
+      // Obtiene los datos guardados del registro
+      const savedUser = localStorage.getItem('admin-user');
+      const savedPass = localStorage.getItem('admin-pass');
+
+      // Verifica si coinciden
+      if (user === savedUser && pass === savedPass) {
+        localStorage.setItem('loggedIn', 'true'); // Marca la sesión activa
+        alert('Bienvenido, acceso concedido');
+        window.location.href = 'admin.html'; // Redirige al panel
+      } else {
+        alert('Usuario o contraseña incorrectos.');
+      }
+    });
+  </script>
+
+</body>
+</html>

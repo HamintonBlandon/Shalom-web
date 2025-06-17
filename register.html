@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Administrador</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Si el usuario ya se registró, lo redirige directamente al login
+    if (localStorage.getItem('registered') === 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Navegación -->
+  <div class="nav">
+    <a href="index.html">Inicio</a>
+    <a href="register.html">Registrarse</a>
+    <a href="login.html">Iniciar Sesión</a>
+    <a href="admin.html">Panel del Administrador</a>
+  </div>
+
+  <!-- Formulario de registro -->
+  <div class="container">
+    <h1>Registro de Administrador</h1>
+    <input type="text" id="new-username" placeholder="Nuevo usuario" required>
+    <input type="password" id="new-password" placeholder="Nueva contraseña" required>
+    <button onclick="register()">Registrar</button>
+    <p>¿Ya tienes una cuenta? <a href="login.html">Inicia sesión</a></p>
+  </div>
+
+  <script>
+    // Función para registrar al administrador por primera vez
+    function register() {
+      const username = document.getElementById('new-username').value.trim();
+      const password = document.getElementById('new-password').value.trim();
+
+      if (username && password) {
+        // Guarda las credenciales en localStorage
+        localStorage.setItem('admin-user', username);
+        localStorage.setItem('admin-pass', password);
+
+        // Marca que el usuario ya fue registrado
+        localStorage.setItem('registered', 'true');
+
+        alert('Usuario registrado exitosamente.');
+        window.location.href = 'login.html'; // Redirige a login
+      } else {
+        alert('Por favor, completa todos los campos.');
+      }
+    }
+  </script>
+
+</body>
+</html>
